@@ -125,11 +125,14 @@ begin
           if ReadProcessMemory(processhandle, pointer(address), ba, customtype.bytesize, x) then
           begin
             if customtype.scriptUsesFloat then
-              customtype.ConvertFloatToData(s, ba)
+              customtype.ConvertFloatToData(s, ba, PtrUInt(address))
             else
-              customtype.ConvertIntegerToData(v, ba);
+              customtype.ConvertIntegerToData(v, ba, PtrUInt(address));
 
-            WriteProcessMemory(processhandle, pointer(address), ba, customtype.bytesize, x);
+            if customtype.scriptNeedsRealAddress then
+              WriteProcessMemory(processhandle, pointer(address), ba, customtype.bytesize-8, x)
+            else
+              WriteProcessMemory(processhandle, pointer(address), ba, customtype.bytesize, x);
           end;
         finally
           freemem(ba);
@@ -367,8 +370,11 @@ begin
         getmem(buf2, customtype.bytesize);
         try
           if ReadProcessMemory(processhandle,pointer(address),buf2,customtype.bytesize,x) then
-            result:=readAndParsePointer(buf2, variabletype, customtype, showashexadecimal, showAsSigned, bytesize);
-
+            begin
+              if customtype.scriptNeedsRealAddress then
+                PPtrUInt(@buf2[0]+customtype.bytesize-8)^:=PtrUInt(address);
+              result:=readAndParsePointer(buf2, variabletype, customtype, showashexadecimal, showAsSigned, bytesize);
+            end;
         finally
           freemem(buf2);
         end;

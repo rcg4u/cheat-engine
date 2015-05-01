@@ -46,6 +46,7 @@ type
     currentscript: tstringlist;
     fCustomTypeType: TCustomTypeType; //plugins set this to cttPlugin
     fScriptUsesFloat: boolean;
+    fScriptNeedsRealAddress: boolean;
 
 
 
@@ -65,12 +66,12 @@ type
 
     function ConvertDataToInteger(data: pointer): integer;
     function ConvertDataToIntegerLua(data: pbytearray): integer;
-    procedure ConvertIntegerToData(i: integer; output: pointer);
+    procedure ConvertIntegerToData(i: integer; output: pointer; realAddress: PtrUInt=0);
     procedure ConvertIntegerToDataLua(i: integer; output: pbytearray);
 
     function ConvertDataToFloat(data: pointer): single;
     function ConvertDataToFloatLua(data: pbytearray): single;
-    procedure ConvertFloatToData(f: single; output: pointer);
+    procedure ConvertFloatToData(f: single; output: pointer; realAddress: PtrUInt=0);
     procedure ConvertFloatToDataLua(f: single; output: pbytearray);
 
 
@@ -89,6 +90,7 @@ type
     property CustomTypeType: TCustomTypeType read fCustomTypeType;
     property script: string read getScript write setScript;
     property scriptUsesFloat: boolean read fScriptUsesFloat write fScriptUsesFloat;
+    property scriptNeedsRealAddress: boolean read fScriptNeedsRealAddress write fScriptNeedsRealAddress;
   end;
   PCustomType=^TCustomType;
 
@@ -218,7 +220,7 @@ begin
 
 end;
 
-procedure TCustomType.ConvertIntegerToData(i: integer; output: pointer);
+procedure TCustomType.ConvertIntegerToData(i: integer; output: pointer; realAddress: PtrUInt=0);
 var f: single;
 begin
 
@@ -229,7 +231,24 @@ begin
   end;
 
   if assigned(reverseroutine) then
-    reverseroutine(i,output)
+    begin
+     asm
+     {$ifdef cpu64}
+       push r8
+       mov r8,realAddress
+     {$else}
+       push realAddress
+     {$endif}
+     end;
+     reverseroutine(i,output);
+     asm
+     {$ifdef cpu64}
+       pop r8
+     {$else}
+       add esp,04
+     {$endif}
+     end;
+    end
   else
   begin
     //possible lua
@@ -348,7 +367,7 @@ begin
 end;
 
 
-procedure TCustomType.ConvertFloatToData(f: single; output: pointer);
+procedure TCustomType.ConvertFloatToData(f: single; output: pointer; realAddress: PtrUInt=0);
 var i: integer;
 begin
 
@@ -358,7 +377,24 @@ begin
     i:=trunc(f);
 
   if assigned(reverseroutine) then
-    reverseroutine(i,output)
+    begin
+     asm
+     {$ifdef cpu64}
+       push r8
+       mov r8,realAddress
+     {$else}
+       push realAddress
+     {$endif}
+     end;
+     reverseroutine(i,output);
+     asm
+     {$ifdef cpu64}
+       pop r8
+     {$else}
+       add esp,04
+     {$endif}
+     end;
+    end
   else
   begin
     //possible lua
@@ -484,6 +520,7 @@ var i: integer;
   oldfunctiontypename: string;
   newpreferedalignment, oldpreferedalignment: integer;
   oldScriptUsesFloat, newScriptUsesFloat: boolean;
+  oldScriptNeedsRealAddress, newScriptNeedsRealAddress: boolean;
   newroutine, oldroutine: TConversionRoutine;
   newreverseroutine, oldreverseroutine: TReverseConversionRoutine;
   newbytesize, oldbytesize: integer;
@@ -501,6 +538,7 @@ begin
   oldbytesize:=bytesize;
   oldpreferedalignment:=preferedalignment;
   oldScriptUsesFloat:=fScriptUsesFloat;
+  oldScriptNeedsRealAddress:=fScriptNeedsRealAddress;
 
   setlength(oldallocarray, length(c));
   for i:=0 to length(c)-1 do
@@ -539,6 +577,9 @@ begin
             if uppercase(c[i].varname)='USESFLOAT' then
               newScriptUsesFloat:=pbyte(c[i].address)^<>0;
 
+            if uppercase(c[i].varname)='USESREALADDRESS' then
+              newScriptNeedsRealAddress:=pbyte(c[i].address)^<>0;
+
             if uppercase(c[i].varname)='CONVERTBACKROUTINE' then
               newreverseroutine:=pointer(c[i].address);
           end;
@@ -546,6 +587,8 @@ begin
           if newpreferedalignment=-1 then
             newpreferedalignment:=newbytesize;
 
+          if newScriptNeedsRealAddress then
+            newbytesize:=newbytesize+8;
 
 
           //still here
@@ -558,6 +601,7 @@ begin
 
           preferedAlignment:=newpreferedalignment;
           fScriptUsesFloat:=newScriptUsesFloat;
+          fScriptNeedsRealAddress:=newScriptNeedsRealAddress;
 
           fCustomTypeType:=cttAutoAssembler;
           if currentscript<>nil then
@@ -659,6 +703,7 @@ begin
       bytesize:=oldbytesize;
       preferedAlignment:=oldpreferedalignment;
       fScriptUsesFloat:=oldScriptUsesFloat;
+      fScriptNeedsRealAddress:=oldScriptNeedsRealAddress;
 
       setlength(c,length(oldallocarray));
       for i:=0 to length(oldallocarray)-1 do

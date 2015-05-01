@@ -1820,6 +1820,9 @@ begin
       begin
         if customtype<>nil then
         begin
+          if customtype.scriptNeedsRealAddress then
+            PPtrUInt(buf+bufsize-8)^:=PtrUInt(realAddress);
+
           if customtype.scriptUsesFloat then
             result:=FloatToStr(customtype.ConvertDataToFloat(buf))
           else
@@ -2049,9 +2052,9 @@ begin
         if customtype<>nil then
         Begin
           if customtype.scriptUsesFloat then
-            customtype.ConvertFloatToData(strtofloat(currentValue), ps)
+            customtype.ConvertFloatToData(strtofloat(currentValue), ps, PtrUInt(realAddress))
           else
-            customtype.ConvertIntegerToData(strtoint(currentValue), pdw);
+            customtype.ConvertIntegerToData(strtoint(currentValue), pdw, PtrUInt(realAddress));
 
         end;
       end;
@@ -2179,7 +2182,10 @@ begin
       end;
     end;
 
-    WriteProcessMemory(processhandle, pointer(realAddress), buf, bufsize, x);
+    if customtype.scriptNeedsRealAddress then
+      WriteProcessMemory(processhandle, pointer(realAddress), buf, bufsize-8, x)
+    else
+      WriteProcessMemory(processhandle, pointer(realAddress), buf, bufsize, x);
 
 
   finally

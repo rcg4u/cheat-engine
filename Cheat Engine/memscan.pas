@@ -2958,6 +2958,7 @@ Excludes the previousvalue buffer
 var stepsize: integer;
     lastmem: ptruint;
     p: pbyte;
+    modifiedMEM: PByteArray;
     i: TVariableType;
     j,k: integer;
     _fastscan: boolean;
@@ -2968,7 +2969,10 @@ begin
   _fastscan:=fastscanmethod<>fsmNotAligned;
   p:=buffer;
   lastmem:=ptruint(p)+(size-variablesize); //optimizes compile to use reg if possible
+  modifiedMEM:=nil;
 
+  if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+    getmem(modifiedMEM,variablesize);
 
   if _fastscan then
   begin
@@ -3051,6 +3055,22 @@ begin
   begin
     while (ptruint(p)<=lastmem) do
     begin
+      if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+      begin
+        copyMemory(modifiedMEM,p,variablesize);
+        PPtrUInt(@modifiedMEM[variablesize-8])^:=PtrUInt(base+ptruint(p)-ptruint(buffer));
+
+        if checkroutine(modifiedMEM,nil) then //found one
+        begin
+          StoreResultRoutine(base+ptruint(p)-ptruint(buffer),modifiedMEM);
+          if OnlyOne then
+          begin
+            AddressFound:=base+ptruint(p)-ptruint(buffer);
+            exit;
+          end;
+        end;
+      end
+      else
       if checkroutine(p,nil) then //found one
       begin
         StoreResultRoutine(base+ptruint(p)-ptruint(buffer),p);
@@ -3064,6 +3084,8 @@ begin
       inc(p,stepsize);
     end;
   end;
+
+  if modifiedMEM<>nil then freemem(modifiedMEM);
 end;
 
 procedure TScanner.FirstNextScanmem(base:ptruint; buffer,oldbuffer: pointer; size: integer);
@@ -3073,6 +3095,7 @@ Scan the given buffer
 var stepsize:  integer;
     lastmem:   ptruint;
     p,oldp:    pbyte;
+    modifiedMEM: pbytearray;
     valuetype: TVariableType;
     _fastscan: boolean;
     dividableby2: boolean;
@@ -3083,7 +3106,10 @@ begin
   p:=buffer;
   oldp:=oldbuffer;
   lastmem:=ptruint(p)+(size-variablesize); //optimizes compile to use reg if possible
+  modifiedMEM:=nil;
 
+  if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+    getmem(modifiedMEM,variablesize);
 
   _fastscan:=fastscanmethod<>fsmNotAligned;
   if _fastscan then
@@ -3147,6 +3173,15 @@ begin
     begin
       while ptruint(p)<=lastmem do
       begin
+        if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+        begin
+          copyMemory(modifiedMEM,p,variablesize);
+          PPtrUInt(@modifiedMEM[variablesize-8])^:=PtrUInt(base+ptruint(p)-ptruint(buffer));
+
+          if checkroutine(modifiedMEM,savedscanhandler.getpointertoaddress(base+ptrUint(p)-ptrUint(buffer),valuetype,customtype )) then //found one
+            StoreResultRoutine(base+ptruint(p)-ptruint(buffer),modifiedMEM);
+        end
+        else
         if checkroutine(p,savedscanhandler.getpointertoaddress(base+ptrUint(p)-ptrUint(buffer),valuetype,customtype )) then //found one
           StoreResultRoutine(base+ptruint(p)-ptruint(buffer),p);
 
@@ -3189,6 +3224,15 @@ begin
     begin
       while ptruint(p)<=lastmem do
       begin
+        if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+        begin
+          copyMemory(modifiedMEM,p,variablesize);
+          PPtrUInt(@modifiedMEM[variablesize-8])^:=PtrUInt(base+ptruint(p)-ptruint(buffer));
+
+          if checkroutine(modifiedMEM,oldp) then //found one
+            StoreResultRoutine(base+ptruint(p)-ptruint(buffer),modifiedMEM);
+        end
+        else        
         if checkroutine(p,oldp) then //found one
           StoreResultRoutine(base+ptruint(p)-ptruint(buffer),p);
 
@@ -3197,6 +3241,8 @@ begin
       end;
     end;
   end;
+
+  if modifiedMEM<>nil then freemem(modifiedMEM);
 end;
 
 procedure TScanner.nextnextscanmemAll(addresslist: pointer; oldmemory: pointer; chunksize: integer);
@@ -3460,6 +3506,7 @@ var
     currentbase: ptruint;
     newmemory: array [0..4095] of byte;
     oldmem: pbytearray;
+    modifiedMEM: pbytearray;
     alist: PPtrUintArray;
     actualread: ptrUint;
 
@@ -3474,6 +3521,10 @@ begin
   oldmem:=oldmemory;
   alist:=addresslist;
   phandle:=processhandle;
+  modifiedMEM:=nil;
+
+  if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+    getmem(modifiedMEM,variablesize);
 
   case variableType of
     vtByte:   valuetype:=vtbyte;
@@ -3528,12 +3579,30 @@ begin
       if compareToSavedScan then
       begin
         for k:=i to j do
+          if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+          begin
+            copyMemory(modifiedMEM,@newmemory[alist[k]-currentbase],vsize);
+            PPtrUInt(@modifiedMEM[vsize-8])^:=PtrUInt(alist[k]);
+
+            if checkroutine(modifiedMEM,savedscanhandler.getpointertoaddress(alist[k],valuetype, customType )) then
+              StoreResultRoutine(alist[k],modifiedMEM);
+          end
+          else
           if checkroutine(@newmemory[alist[k]-currentbase],savedscanhandler.getpointertoaddress(alist[k],valuetype, customType )) then
-            StoreResultRoutine(alist[k],@newmemory[alist[k]-currentbase])
+            StoreResultRoutine(alist[k],@newmemory[alist[k]-currentbase]);
       end
       else
       begin
         for k:=i to j do
+          if (variableType=vtCustom) and customType.scriptNeedsRealAddress then
+          begin
+            copyMemory(modifiedMEM,@newmemory[alist[k]-currentbase],vsize);
+            PPtrUInt(@modifiedMEM[vsize-8])^:=PtrUInt(alist[k]);
+
+           if CheckRoutine(modifiedMEM,@oldmem[k*vsize]) then
+             StoreResultRoutine(alist[k],modifiedMEM);
+          end
+          else
           if CheckRoutine(@newmemory[alist[k]-currentbase],@oldmem[k*vsize]) then
             StoreResultRoutine(alist[k],@newmemory[alist[k]-currentbase]);
       end;
@@ -3541,6 +3610,8 @@ begin
 
     i:=j+1;
   end;
+
+  if modifiedMEM<>nil then freemem(modifiedMEM);
 end;
 
 procedure TScanner.configurescanroutine;

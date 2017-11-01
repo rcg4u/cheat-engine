@@ -1,0 +1,1 @@
+registerFormAddNotification(function(f)  f.PopupMode='pmAuto' end) 

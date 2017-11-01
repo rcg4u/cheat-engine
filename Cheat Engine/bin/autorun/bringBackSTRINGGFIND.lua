@@ -1,0 +1,1 @@
+string.gfind = string.gmatch

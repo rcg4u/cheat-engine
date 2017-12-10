@@ -1015,22 +1015,24 @@ function mono_class_enumMethods(class, includeParents)
 
   until (method==nil) or (method==0)
 
-  monopipe.unlock()
-  
+  -- changing this section to allow aphabetized classes and functions in mono dissect 
+
+monopipe.unlock()
+ 
   local temp={}
   local i
   for i=1,#methods do
     temp[i]={methods[i].name, methods[i]}
   end
   table.sort(temp, function(e1,e2) return e1[1] < e2[1] end)
-  
+ 
   methods={}
   for i=1,#temp do
     methods[i]=temp[i][2]
-  end  
+  end 
 
   return methods
-end
+end 
 
 function mono_getJitInfo(address)
   --if debug_canBreak() then return nil end

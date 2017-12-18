@@ -10,7 +10,7 @@ object MainForm: TMainForm
   VertScrollBar.Visible = False
   AllowDropFiles = True
   AutoSize = True
-  Caption = 'Cheat Engine 6.7'
+  Caption = 'Cheat Engine 6.7 custom compiled by Forrest'
   ClientHeight = 679
   ClientWidth = 701
   Menu = MainMenu1
@@ -74,10 +74,10 @@ object MainForm: TMainForm
       ParentShowHint = False
     end
     object CommentButton: TSpeedButton
-      Left = 634
+      Left = 635
       Height = 30
       Top = 1
-      Width = 66
+      Width = 65
       Align = alRight
       AutoSize = True
       Caption = 'Table Extras'
@@ -159,7 +159,7 @@ object MainForm: TMainForm
       Left = 374
       Height = 15
       Top = 79
-      Width = 57
+      Width = 56
       BorderSpacing.Top = 8
       Caption = 'Scan Value'
       Enabled = False
@@ -170,10 +170,10 @@ object MainForm: TMainForm
       AnchorSideTop.Control = ScanType
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = ScanType
-      Left = 318
+      Left = 319
       Height = 15
       Top = 128
-      Width = 54
+      Width = 53
       Anchors = [akTop, akRight]
       BorderSpacing.Right = 2
       Caption = 'Scan Type'
@@ -184,10 +184,10 @@ object MainForm: TMainForm
       AnchorSideTop.Control = VarType
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = VarType
-      Left = 314
+      Left = 316
       Height = 15
       Top = 153
-      Width = 58
+      Width = 56
       Anchors = [akTop, akRight]
       BorderSpacing.Right = 2
       Caption = 'Value Type'
@@ -785,7 +785,6 @@ object MainForm: TMainForm
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Right = 5
       Enabled = False
-      OnChange = scanvalueChange
       OnKeyPress = ScanvalueoldKeyPress
       PopupMenu = ccpmenu
       TabOrder = 4
@@ -1346,8 +1345,6 @@ object MainForm: TMainForm
         ClientWidth = 121
         Constraints.MinHeight = 100
         TabOrder = 0
-        OnClick = pnlScanOptionsClick
-        OnResize = pnlScanOptionsResize
         object pnlFloat: TPanel
           AnchorSideLeft.Control = pnlScanOptions
           AnchorSideTop.Control = cbCaseSensitive
@@ -1642,7 +1639,6 @@ object MainForm: TMainForm
       BorderSpacing.Left = 5
       BorderSpacing.Right = 5
       Enabled = False
-      OnChange = scanvalueChange
       OnKeyPress = ScanvalueoldKeyPress
       PopupMenu = ccpmenu
       TabOrder = 5
@@ -1653,7 +1649,7 @@ object MainForm: TMainForm
       Left = 620
       Height = 15
       Top = 79
-      Width = 57
+      Width = 56
       Caption = 'Scan Value'
       Enabled = False
       ParentBidiMode = False
@@ -2213,6 +2209,7 @@ object MainForm: TMainForm
     top = 488
   end
   object AutoAttachTimer: TTimer
+    Enabled = False
     Interval = 2000
     OnTimer = AutoAttachTimerTimer
     left = 416
@@ -2504,7 +2501,6 @@ object MainForm: TMainForm
       object miSetupSnapshotKeys: TMenuItem
         Caption = 'Start and configure snapshot recording'
         Visible = False
-        OnClick = miSetupSnapshotKeysClick
       end
       object miSnapshothandler: TMenuItem
         Caption = 'Snapshot handler'

@@ -12,7 +12,7 @@ object FindWindow: TFindWindow
   OnShow = FormShow
   PopupMode = pmAuto
   Position = poScreenCenter
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.6.4.0'
   object ProgressBar: TProgressBar
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Panel1
@@ -51,7 +51,7 @@ object FindWindow: TFindWindow
       Left = 3
       Height = 15
       Top = 3
-      Width = 29
+      Width = 28
       BorderSpacing.Left = 3
       BorderSpacing.Top = 3
       Caption = 'Type:'
@@ -74,10 +74,10 @@ object FindWindow: TFindWindow
       AnchorSideTop.Control = EditStop
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = EditStop
-      Left = 168
+      Left = 169
       Height = 15
       Top = 44
-      Width = 14
+      Width = 13
       Anchors = [akTop, akRight]
       BorderSpacing.Right = 2
       Caption = 'To'

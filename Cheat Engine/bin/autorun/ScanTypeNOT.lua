@@ -4,7 +4,7 @@ function ScanTypeNOT.injectAAScript()
 
   local CEVer = getCEVersion()
   local is64bit = cheatEngineIs64Bit()
-  if not (CEVer>=6.4 and CEVer<=6.51) then return false end
+  if not (CEVer>=6.4 and CEVer<=6.7) then return false end
 
   if CEVer==6.4  then VariableTypeOffset=is64bit and '1D9' or '131'
                  else VariableTypeOffset=is64bit and '1F9' or '149' end

@@ -1,7 +1,7 @@
 object About: TAbout
-  Left = 922
+  Left = 923
   Height = 365
-  Top = 326
+  Top = 457
   Width = 713
   HelpContext = 2
   AutoSize = True
@@ -472,7 +472,7 @@ object About: TAbout
       Left = 5
       Height = 57
       Top = 145
-      Width = 350
+      Width = 349
       AutoSize = True
       BorderSpacing.Left = 5
       BorderSpacing.Top = 2
@@ -484,7 +484,7 @@ object About: TAbout
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 5
       ClientHeight = 57
-      ClientWidth = 350
+      ClientWidth = 349
       TabOrder = 2
       object Label21: TLabel
         Left = 2
@@ -514,12 +514,12 @@ object About: TAbout
         Left = 224
         Height = 15
         Top = 2
-        Width = 70
+        Width = 69
         Caption = 'SWAT-Squad'
         ParentColor = False
       end
       object Label25: TLabel
-        Left = 303
+        Left = 302
         Height = 15
         Top = 2
         Width = 45
@@ -554,12 +554,12 @@ object About: TAbout
         Left = 224
         Height = 15
         Top = 21
-        Width = 70
+        Width = 69
         Caption = 'Emperor'
         ParentColor = False
       end
       object Label30: TLabel
-        Left = 303
+        Left = 302
         Height = 15
         Top = 21
         Width = 45
@@ -594,7 +594,7 @@ object About: TAbout
         Left = 224
         Height = 15
         Top = 40
-        Width = 70
+        Width = 69
         Caption = 'Atom0s'
         ParentColor = False
       end

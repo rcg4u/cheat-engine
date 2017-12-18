@@ -231,7 +231,7 @@ var
   ff: TFormFucker;
   r: TRegistry;
 begin
-  Application.Title:='Cheat Engine 6.7';
+  Application.Title:='Cheat Engine 6.7 custom compiled 12/11/18 Forrest';
   Application.Initialize;
 
   overridefont:=nil;

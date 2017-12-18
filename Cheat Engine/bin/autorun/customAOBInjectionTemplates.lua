@@ -43,8 +43,282 @@ dealloc(newmem_%cheatName%)
 ]==]
 },
 
+{
+displayName="Rcg4u's AOB",
+submenu="Rcg's Aob Injection Templates",
+templateSections=
+[==[
+<<INFO>>
+// Game   : %processName%
+// Version:
+// Date   :
+// Author : %authorName%
+<<INFO_END>>
+
+<<ENABLE>>
+aobscan%isModuleScan%(rcg%cheatName%,%moduleNameC%%searchPattern%)
+
+alloc(newmem%cheatName%,4096,rcg%cheatName%)
+
+label(rcg%cheatName%_r)
+label(rcg%cheatName%_i)
+registersymbol(rcg%cheatName%_r)
+registersymbol(rcg%cheatName%_i)
+
+label(lbl%cheatName%)
+label(lbl%cheatName%Skip)
+label(lbl%cheatName%Ret)
+
+label(bEnable%cheatName%)
+registersymbol(bEnable%cheatName%)
+
+newmem%cheatName%:
+bEnable%cheatName%:
+dd 1
+
+lbl%cheatName%:
+%CoriginalCodeLines%
+//db %originalBytes%
+readmem(rcg%cheatName%%rcgAdjust%,%replacedInstructionsSize%)
+
+cmp dword ptr [bEnable%cheatName%],1
+jne short lbl%cheatName%Skip
+// Place your code here
+
+lbl%cheatName%Skip:
+jmp lbl%cheatName%Ret
+rcg%cheatName%_i:
+readmem(rcg%cheatName%%rcgAdjust%,%replacedInstructionsSize%)
+
+//%injectAddress%:
+rcg%cheatName%%rcgAdjust%:
+rcg%cheatName%_r:
+jmp lbl%cheatName%
+%nopLines%
+lbl%cheatName%Ret:
+
+<<ENABLE_END>>
+
+<<DISABLE>>
+//%injectAddress%:
+%CoriginalCodeLines%
+//db %originalBytes%
+rcg%cheatName%_r:
+readmem(rcg%cheatName%_i,%replacedInstructionsSize%)
+
+unregistersymbol(rcg%cheatName%_r)
+unregistersymbol(rcg%cheatName%_i)
+
+unregistersymbol(bEnable%cheatName%)
+
+dealloc(newmem%cheatName%)
+
+%additionalInfo%
+<<DISABLE_END>>
+]==]
+}, 
+
+{
+displayName="DarkIceCore mandarin",
+templateSections=
+[==[
+<<INFO>>
+// Game   : %processName%
+// Date   : %Date%
+<<INFO_END>>
+
+<<ENABLE>>
+aobscan%isModuleScan%(%cheatName%AOB,%moduleNameC%%searchPattern%)
+registersymbol(%cheatName%AOB)
+//%injectAddress%:
+%cheatName%AOB%aobAdjust%:
+  db %originalBytes%
+//db %originalBytes%
+
+////////////////////////
+//%injectAddress%:
+%CoriginalCodeLines%
+//db %originalBytes%
+
+<<ENABLE_END>>
+
+<<DISABLE>>
+%cheatName%AOB%aobAdjust%:
+  db %originalBytes%
+
+//%injectAddress%:
+%CoriginalCodeLines%
+//db %originalBytes%
+
+unregistersymbol(%cheatName%AOB)
+
+////////////////AOB manual adjust %cheatName%AOB//////////////////
+//AOB +%aobAdjust% hex//RETURN +%replacedInstructionsSize% hex//
+//%searchPattern%
+//%searchPattern%
+//
 
 
+%additionalInfo%
+<<DISABLE_END>>
+]==]
+}, 
+{
+displayName="DarkIceCore Small indi",
+templateSections=
+[==[
+<<INFO>>
+// Game   : %processName%
+// Date   : %Date%
+<<INFO_END>>
+
+<<ENABLE>>
+aobscan%isModuleScan%(%cheatName%AOB,%moduleNameC%%searchPattern%)
+alloc(%cheatName%,1024%CmoduleName%) //%injectAddress%
+///////////////////////////////////////
+label(%cheatName%_indi)
+//
+registersymbol(%cheatName%)
+registersymbol(%cheatName%AOB)
+registersymbol(%cheatName%_indi)
+////////////////////////////////////////
+%cheatName%:
+%_originalCodeLines%
+  mov [%cheatName%_indi],[%regsOffset%]
+  jmp %cheatName%AOB%aobAdjust%+%replacedInstructionsSize%
+//
+
+//db/dw/dd(float)/dq(double)//
+%cheatName%_indi:
+  dq 0
+//
+
+//AOB +%aobAdjust% hex//RETURN +%replacedInstructionsSize% hex//
+%cheatName%AOB%aobAdjust%:
+  jmp %cheatName%
+%_nopLines%
+  jmp %cheatName%AOB%aobAdjust%+%replacedInstructionsSize% 
+// 
+
+////////////////////////
+//%injectAddress%:
+%CoriginalCodeLines%
+//db %originalBytes%
+
+<<ENABLE_END>>
+
+<<DISABLE>>
+%cheatName%AOB%aobAdjust%:
+  db %originalBytes%
+
+//%injectAddress%:
+%CoriginalCodeLines%
+//db %originalBytes%
+
+unregistersymbol(%cheatName%)
+unregistersymbol(%cheatName%AOB)
+unregistersymbol(%cheatName%_indi)
+dealloc(%cheatName%)
+
+////////////////AOB manual adjust %cheatName%AOB//////////////////
+//AOB +%aobAdjust% hex//RETURN +%replacedInstructionsSize% hex//
+//%searchPattern%
+//%searchPattern%
+//
+
+%additionalInfo%
+<<DISABLE_END>>
+]==]
+}, 
+{
+displayName="DarkIceCore Big chi",
+templateSections=
+[==[
+<<INFO>>
+// Game   : %processName%
+// Date   : %Date%
+<<INFO_END>>
+
+<<ENABLE>>
+aobscan%isModuleScan%(%cheatName%AOB,%moduleNameC%%searchPattern%)
+alloc(%cheatName%,2048%CmoduleName%) //%injectAddress%
+///////////////////////////////////////
+label(%cheatName%_indi)
+//label(%cheatName%_cmp)
+//label(%cheatName%_org)
+//
+registersymbol(%cheatName%)
+registersymbol(%cheatName%AOB)
+registersymbol(%cheatName%_indi)
+//registersymbol(%cheatName%_cmp)
+//registersymbol(%cheatName%_org)
+////////////////////////////////////////
+%cheatName%:
+%_originalCodeLines%
+  mov [%cheatName%_indi],[%regsOffset%]
+  jmp %cheatName%AOB%aobAdjust%+%replacedInstructionsSize%
+//
+
+//
+//%cheatName%_cmp:
+//cmp
+//je/jne %cheatName%_org
+//mov
+%CoriginalCodeLines%
+//jmp %cheatName%AOB%aobAdjust%+%replacedInstructionsSize%
+//
+
+//
+//%cheatName%_org:
+%CoriginalCodeLines%
+//jmp %cheatName%AOB%aobAdjust%+%replacedInstructionsSize%
+//
+
+//db/dw/dd(float)/dq(double)//
+%cheatName%_indi:
+  dq 0
+//
+
+//AOB +%aobAdjust% hex//RETURN +%replacedInstructionsSize% hex//
+%cheatName%AOB%aobAdjust%:
+  jmp %cheatName%
+%_nopLines%
+  jmp %cheatName%AOB%aobAdjust%+%replacedInstructionsSize%
+// 
+
+////////////////////////
+//%injectAddress%:
+%CoriginalCodeLines%
+//db %originalBytes%
+
+<<ENABLE_END>>
+
+<<DISABLE>>
+%cheatName%AOB%aobAdjust%:
+  db %originalBytes%
+
+//%injectAddress%:
+%CoriginalCodeLines%
+//db %originalBytes%
+
+unregistersymbol(%cheatName%)
+unregistersymbol(%cheatName%AOB)
+unregistersymbol(%cheatName%_indi)
+//unregistersymbol(%cheatName%_cmp)
+//unregistersymbol(%cheatName%_org)
+dealloc(%cheatName%)
+
+////////////////AOB manual adjust %cheatName%AOB//////////////////
+//AOB +%aobAdjust% hex//RETURN +%replacedInstructionsSize% hex//
+//%searchPattern%
+//%searchPattern%
+//
+
+
+%additionalInfo%
+<<DISABLE_END>>
+]==]
+}, 
 
 {
 displayName="Alternative AOB with bracketsRegsOffset",

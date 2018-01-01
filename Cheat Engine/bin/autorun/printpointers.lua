@@ -1,4 +1,4 @@
---##### Copy Pointer Offsets for Cheat Engine
+ --##### Copy Pointer Offsets for Cheat Engine
 --##### Author: FreeER
 --##### Github: https://github.com/FreeER
 --##### Website: https://www.facebook.com/groups/CheatTheGame
@@ -8,6 +8,7 @@ local function findMenu(mi)
 while not mi.Menu do mi = mi.Parent end
 return mi.Menu
 end
+
 local del_mi = MainForm.Deletethisrecord1
 local del_menu = findMenu(del_mi)
 
@@ -38,4 +39,13 @@ printOffsets(v)
 end
 end
 end
+
+-- use timer to avoid issue in some circumstances
+local t = createTimer()
+t.Interval = 100
+t.OnTimer = function()
+if del_menu.Items and del_mi.MenuIndex then
 del_menu.Items.insert(del_mi.MenuIndex, mi)
+t.destroy()
+end
+end
